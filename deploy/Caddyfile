@@ -6,7 +6,7 @@ lagerplan.example.dk {
 	encode zstd gzip
 
 	handle_path /static/* {
-		root * /srv/lagerplan/staticfiles
+		root * /srv/lagerplan/Lagerplan/staticfiles
 		file_server
 	}
 

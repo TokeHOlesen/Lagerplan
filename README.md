@@ -106,7 +106,7 @@ take the site down. Changes also apply to past weeks.
 
 ## Deploying on Debian
 
-These steps assume the app lives in `/srv/lagerplan` and runs as the system
+These steps assume the app lives in `/srv/lagerplan/Lagerplan` and runs as the system
 user `lagerplan`. Replace `lagerplan.example.dk` with your host name, whose
 DNS must point at the server (needed for the Let's Encrypt certificate).
 
@@ -116,12 +116,12 @@ sudo apt install python3-venv sqlite3 caddy
 
 # 2. User and code
 sudo adduser --system --group --home /srv/lagerplan lagerplan
-# Copy the project into /srv/lagerplan (git clone, rsync or unzip), then:
-sudo chown -R lagerplan:lagerplan /srv/lagerplan
-sudo chmod 755 /srv/lagerplan
+# Copy the project into /srv/lagerplan/Lagerplan (git clone, rsync or unzip), then:
+sudo chown -R lagerplan:lagerplan /srv/lagerplan/Lagerplan
+sudo chmod 755 /srv/lagerplan /srv/lagerplan/Lagerplan   # Caddy must be able to read staticfiles
 
 # 3. Python environment
-cd /srv/lagerplan
+cd /srv/lagerplan/Lagerplan
 sudo -u lagerplan python3 -m venv .venv
 sudo -u lagerplan .venv/bin/pip install -r requirements.txt
 
@@ -156,7 +156,7 @@ Logs: `sudo journalctl -u lagerplan -f` (app) and `sudo journalctl -u caddy -f`.
 ### Updating to a new version
 
 ```sh
-cd /srv/lagerplan
+cd /srv/lagerplan/Lagerplan
 # copy in the new code (git pull, rsync, ...), keeping .env, db.sqlite3 and rates.toml
 sudo -u lagerplan .venv/bin/pip install -r requirements.txt
 sudo -u lagerplan .venv/bin/python manage.py migrate
@@ -171,7 +171,7 @@ safe copy while the app runs and keeps 30 days. Schedule it with
 `sudo crontab -u lagerplan -e`:
 
 ```
-15 2 * * * /srv/lagerplan/deploy/backup.sh
+15 2 * * * /srv/lagerplan/Lagerplan/deploy/backup.sh
 ```
 
-Copy `/srv/lagerplan/backups` off the server regularly as well.
+Copy `/srv/lagerplan/Lagerplan/backups` off the server regularly as well.

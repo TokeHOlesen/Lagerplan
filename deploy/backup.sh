@@ -1,9 +1,9 @@
 #!/bin/sh
 # Daily SQLite backup, keeping the last 30 days.
 # Run from cron as the lagerplan user, e.g. in `sudo crontab -u lagerplan -e`:
-#   15 2 * * * /srv/lagerplan/deploy/backup.sh
+#   15 2 * * * /srv/lagerplan/Lagerplan/deploy/backup.sh
 set -eu
-APP_DIR=/srv/lagerplan
+APP_DIR=/srv/lagerplan/Lagerplan
 BACKUP_DIR="$APP_DIR/backups"
 mkdir -p "$BACKUP_DIR"
 # .backup makes a consistent copy even while the app is running.
