@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Log ind{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+  <h1>Log ind</h1>
+  <form method="post" class="stacked-form">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="form-actions">
+      <button type="submit" class="button">Log ind</button>
+    </div>
+  </form>
+  <p class="muted small">Glemt adgangskode? Kontakt en administrator.</p>
+</section>
+{% endblock %}

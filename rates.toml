@@ -1,0 +1,83 @@
+# Rates used by the workload calculation.
+#
+# Changes take effect automatically within a second or two; no restart needed.
+# Check the file after editing with:   python manage.py check_rates
+# If the file is invalid, the app keeps using the last valid version and logs an error.
+# Changing a value also changes the figures shown for past weeks.
+
+# Man-hours per 100 pcs, by pick series type.
+[pick_series]
+mixed       = 3.0   # Blandet serie
+dsv         = 2.0   # DSV-serie
+large_mixed = 1.5   # Stor serie, forskellige varer
+large_same  = 1.2   # Stor serie, ens varer
+cushions    = 1.3   # Hynder
+
+# Task times set per pick series type. These replace the [handling] rate (and
+# one-piece handling) for that task and type. Tasks: forklift, wrapping,
+# booking, labeling.  per_100 = hours per 100 pcs; per_series = hours per
+# pick series, whatever its size.
+[task_overrides.booking]
+mixed       = { per_100 = 0.35 }
+dsv         = { per_series = 0.12 }
+large_mixed = { per_series = 0.12 }
+large_same  = { per_series = 0.12 }
+cushions    = { per_series = 0.12 }
+
+# Man-hours per 100 pcs, regardless of pick series type.
+[handling]
+forklift   = 1.0
+wrapping   = 0.85
+booking    = 0.2
+labeling   = 0.15
+collection = 1.1    # per 100 pcs collected, counted on the day of collection
+
+# Pick series types that count as ONE piece per series for some tasks, whatever
+# the number of pcs. Picking and tasks not listed use the actual number of pcs.
+# Tasks: forklift, wrapping, booking, labeling, collection.
+[one_piece_handling]
+cushions = ["forklift", "wrapping", "booking", "collection", "labeling"]
+
+[collection]
+# Share of a day's picked items collected 1, 2 and 3 working days later.
+# Must add up to 1.0. Add or remove entries to change the number of days.
+schedule = [0.65, 0.25, 0.10]
+# Share of a day's collected pallets that free up space during that day
+# (collected early or midday). 0 = all leave at the end of the day.
+freed_during_day = 0.5
+
+# Pallets created by a pick series, by type. Give each type a value in one of
+# the two sections (or both, and they are added together):
+#   [pallets_per_100]     pallets per 100 pcs in the series
+#   [pallets_per_series]  fixed pallets per series, regardless of the number of pcs
+[pallets_per_100]
+mixed       = 22
+dsv         = 20
+large_mixed = 18
+large_same  = 15
+
+[pallets_per_series]
+cushions    = 1
+
+[storage]
+capacity         = 400    # pallet spaces
+tight_above      = 0.8   # occupied share above which storage is tight
+very_tight_above = 0.90   # occupied share above which storage is very tight
+tight_surcharge         = 0.10
+very_tight_surcharge    = 0.15
+over_capacity_surcharge = 0.20   # above 100 % occupied
+
+[staffing]
+hours_per_employee = 7.5   # standard working day; employees needed = man-hours / this
+
+[calendar]
+# Danish public holidays are built in. List any other closed days here:
+# "MM-DD" for every year, "YYYY-MM-DD" for a single day.
+# Example: ["06-05", "12-24", "12-31", "2026-12-28"]
+extra_closed_days = []
+
+# Pallet estimate shown in brackets next to "Stk. til pluk", e.g. "245 (ca. 66 pll)".
+# Display only: storage uses the per-type figures above.
+[pallet_estimate]
+per_100 = 27                       # pallets per 100 pcs, for every type not listed below
+per_series = { cushions = 1 }      # fixed pallets per series, whatever the number of pcs

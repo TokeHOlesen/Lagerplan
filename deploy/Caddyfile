@@ -1,0 +1,16 @@
+# Caddy site for Lagerplan. Replace the host name with your own.
+# Caddy obtains and renews the Let's Encrypt certificate automatically.
+# Append to /etc/caddy/Caddyfile, then: sudo systemctl reload caddy
+
+lagerplan.example.dk {
+	encode zstd gzip
+
+	handle_path /static/* {
+		root * /srv/lagerplan/staticfiles
+		file_server
+	}
+
+	handle {
+		reverse_proxy 127.0.0.1:8001
+	}
+}

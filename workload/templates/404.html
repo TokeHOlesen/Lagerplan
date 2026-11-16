@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Ikke fundet{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+  <h1>Siden findes ikke</h1>
+  <p><a class="button secondary" href="{% url 'home' %}">Til ugeoversigten</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Brugere{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>Brugere</h1>
+  <a class="button" href="{% url 'user_create' %}">+ Ny bruger</a>
+</div>
+
+<section class="card">
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th>Brugernavn</th><th>Navn</th><th>Rolle</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        {% with u=row.user %}
+        <tr{% if not u.is_active %} class="inactive"{% endif %}>
+          <td>{{ u.username }}{% if u.pk == user.pk %} <span class="muted">(dig)</span>{% endif %}</td>
+          <td>{{ u.get_full_name|default:"–" }}</td>
+          <td>{% if u.is_superuser %}Ejer{% elif u.is_staff %}Administrator{% else %}Læser{% endif %}</td>
+          <td>{% if u.is_active %}Aktiv{% else %}Inaktiv{% endif %}</td>
+          <td class="actions">
+            {% if row.manageable %}
+            <a href="{% url 'user_edit' u.pk %}">Redigér</a>
+            <a href="{% url 'user_password' u.pk %}">Ny adgangskode</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="muted small">Glemt adgangskode: vælg „Ny adgangskode“ ud for brugeren, og giv brugeren den nye adgangskode. Brugeren kan selv skifte den bagefter.</p>
+</section>
+{% endblock %}

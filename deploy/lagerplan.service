@@ -1,0 +1,29 @@
+# systemd unit for Lagerplan.
+# Install: sudo cp deploy/lagerplan.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now lagerplan
+
+[Unit]
+Description=Lagerplan (Django via Gunicorn)
+After=network.target
+
+[Service]
+User=lagerplan
+Group=lagerplan
+WorkingDirectory=/srv/lagerplan
+ExecStart=/srv/lagerplan/.venv/bin/gunicorn lagerplan.wsgi:application \
+    --bind 127.0.0.1:8001 \
+    --workers 3 \
+    --access-logfile - \
+    --error-logfile -
+Restart=on-failure
+RestartSec=5
+
+# Hardening: the service can only write inside its own folder.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/lagerplan
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Redigér uge {{ week }}, {{ year }}{% endblock %}
+
+{% block content %}
+<div class="week-head">
+  <a class="nav-arrow" href="{% url 'week_edit' prev_year prev_week %}" title="Forrige uge" aria-label="Forrige uge">&#8592;</a>
+  <div class="week-title">
+    <h1>Redigér uge {{ week }} <span class="muted">· {{ year }}</span></h1>
+    <p class="muted">{{ range_label }}</p>
+  </div>
+  <a class="nav-arrow" href="{% url 'week_edit' next_year next_week %}" title="Næste uge" aria-label="Næste uge">&#8594;</a>
+</div>
+
+<form method="post" class="week-form">
+  {% csrf_token %}
+  {% for day in days %}
+  <section class="card day-edit">
+    <h2>{{ day.weekday }} <span class="muted">{{ day.date_label }}</span></h2>
+    {% if day.closed %}
+      <p class="muted">Lukket: {{ day.closed }}</p>
+    {% else %}
+      {% with fs=day.formset %}
+      {{ fs.management_form }}
+      {% if fs.non_form_errors %}<div class="form-errors">{{ fs.non_form_errors }}</div>{% endif %}
+      <table class="edit-table">
+        <thead><tr><th>Type</th><th>Antal stk.</th><th>Slet</th></tr></thead>
+        <tbody id="rows-{{ fs.prefix }}">
+          {% for form in fs %}{% include "workload/_pick_row.html" %}{% endfor %}
+        </tbody>
+      </table>
+      <template id="tpl-{{ fs.prefix }}">{% include "workload/_pick_row.html" with form=fs.empty_form %}</template>
+      <button type="button" class="button secondary small" data-add-row="{{ fs.prefix }}">+ Tilføj serie</button>
+      {% endwith %}
+    {% endif %}
+  </section>
+  {% endfor %}
+
+  <div class="form-actions sticky">
+    <button type="submit" class="button">Gem uge</button>
+    <a class="button secondary" href="{% url 'week' year week %}">Annullér</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}<script src="{% static 'workload/edit.js' %}"></script>{% endblock %}

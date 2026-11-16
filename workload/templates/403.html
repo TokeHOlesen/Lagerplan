@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Ingen adgang{% endblock %}
+
+{% block content %}
+<section class="card narrow">
+  <h1>Ingen adgang</h1>
+  <p>Denne side kræver administratorrettigheder.</p>
+  <p><a class="button secondary" href="{% url 'home' %}">Til ugeoversigten</a></p>
+</section>
+{% endblock %}

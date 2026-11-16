@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Uge {{ week }}, {{ year }}{% endblock %}
+
+{% block content %}
+<div class="week-head">
+  <a class="nav-arrow" href="{% url 'week' prev_year prev_week %}" title="Forrige uge" aria-label="Forrige uge">&#8592;</a>
+  <div class="week-title">
+    <h1>Uge {{ week }} <span class="muted">· {{ year }}</span></h1>
+    <p class="muted">{{ range_label }}</p>
+  </div>
+  <a class="nav-arrow" href="{% url 'week' next_year next_week %}" title="Næste uge" aria-label="Næste uge">&#8594;</a>
+  <div class="week-actions">
+    {% if not is_current %}<a class="button secondary" href="{% url 'week' today_year today_week %}">Denne uge</a>{% endif %}
+    <a class="button secondary" href="{% url 'year' year %}">Kalender</a>
+    {% if is_admin %}<a class="button" href="{% url 'week_edit' year week %}">Redigér uge</a>{% endif %}
+  </div>
+</div>
+
+<div class="week-summary">
+  <div class="stat"><span class="stat-label">Mandetimer i ugen</span><span class="stat-value">{{ week_hours }}</span></div>
+  <div class="stat"><span class="stat-label">Medarbejdere pr. dag (gns.)</span><span class="stat-value">{{ week_employees_avg }}</span><span class="stat-note">Højest {{ week_employees_max }} på én dag</span></div>
+  <div class="stat"><span class="stat-label">Stk. til pluk i denne uge</span><span class="stat-value">{{ week_items }}</span></div>
+</div>
+
+<section class="card">
+  {% if not has_data %}<p class="muted empty-note">Ingen plukserier eller udleveringer i denne uge.</p>{% endif %}
+
+  <div class="chart">
+    <div class="chart-axis" aria-hidden="true">
+      {% for tick in ticks %}<span class="tick" style="bottom: {{ tick.bottom }}%">{{ tick.label }}</span>{% endfor %}
+    </div>
+    <div class="chart-plot">
+      {% for tick in ticks %}<div class="gridline" style="bottom: {{ tick.bottom }}%"></div>{% endfor %}
+      <div class="chart-cols">
+        {% for day in days %}
+        <div class="bar-col{% if day.closed %} closed{% endif %}">
+          {% if day.closed %}
+          <span class="closed-label">{{ day.closed }}</span>
+          {% else %}
+          <div class="bar">
+            {% for seg in day.segments %}
+            <div class="seg seg-{{ seg.key }}" style="height: {{ seg.height }}%" title="{{ seg.label }}: {{ seg.hours }} t"></div>
+            {% endfor %}
+            {% if day.has_hours %}<div class="bar-total">{{ day.total }}</div>{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="chart chart-info">
+    <div></div>
+    {# One grid row per field, five cells each, so a field sits at the same height on every day. #}
+    <div class="info-grid">
+      {% for day in days %}
+      <div class="info-cell day-name">{{ day.weekday }} <span class="muted">{{ day.short_date }}</span></div>
+      {% endfor %}
+
+      {% for day in days %}
+      <div class="info-cell">
+        {% if day.closed %}<span class="muted">Lukket</span>{% else %}
+        <div class="info-label">Mandetimer</div>
+        <div class="info-value big">{{ day.total }}</div>
+        {% if day.has_surcharge %}<div class="small surcharge-note">inkl. +{{ day.surcharge_pct }} % pladsmangeltillæg</div>{% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      {% for day in days %}
+      <div class="info-cell">
+        {% if not day.closed %}
+        <div class="info-label">Medarbejdere</div>
+        <div class="info-value big">{{ day.employees }} <span class="small muted" title="Mandetimer delt med en arbejdsdag, før oprunding">({{ day.employees_exact }})</span></div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      {% for day in days %}
+      <div class="info-cell">
+        {% if not day.closed %}
+        <div class="info-label">Stk. til pluk</div>
+        <div class="info-value">{{ day.items }}{% if day.has_pallets_new %} <span class="muted">(ca. {{ day.pallets_new }} pll)</span>{% endif %}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      {% for day in days %}
+      <div class="info-cell">
+        {% if not day.closed %}
+        <div class="info-label">Lagerplads</div>
+        <div class="info-value">
+          <span class="badge status-{{ day.status }}">{{ day.status_label }}</span>
+          <span class="small muted nowrap">{{ day.occupancy }} %</span>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <ul class="legend">
+    {% for item in legend %}<li><span class="swatch seg-{{ item.key }}"></span>{{ item.label }}</li>{% endfor %}
+  </ul>
+</section>
+
+<details class="card details">
+  <summary>Detaljer (mandetimer pr. opgave)</summary>
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th></th>{% for h in detail_headers %}<th class="num">{{ h }}</th>{% endfor %}<th class="num">Uge</th></tr>
+      </thead>
+      <tbody>
+        {% for row in details %}
+        <tr{% if row.strong %} class="strong"{% endif %}>
+          <th>{{ row.label }}</th>
+          {% for v in row.values %}<td class="num">{{ v }}</td>{% endfor %}
+          <td class="num">{{ row.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</details>
+{% endblock %}

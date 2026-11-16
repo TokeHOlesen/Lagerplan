@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Kalender {{ year }}{% endblock %}
+
+{% block content %}
+<div class="week-head">
+  <a class="nav-arrow" href="{% url 'year' prev_year %}" title="Forrige år" aria-label="Forrige år">&#8592;</a>
+  <div class="week-title">
+    <h1>Kalender {{ year }}</h1>
+    <p class="muted">Klik på et ugenummer eller en dag for at åbne ugen.</p>
+  </div>
+  <a class="nav-arrow" href="{% url 'year' next_year %}" title="Næste år" aria-label="Næste år">&#8594;</a>
+  <div class="week-actions">
+    <a class="button secondary" href="{% url 'week' today_iso_year today_week %}">Denne uge</a>
+  </div>
+</div>
+
+<ul class="legend">
+  <li><span class="swatch cal-good"></span>God</li>
+  <li><span class="swatch cal-tight"></span>Stram</li>
+  <li><span class="swatch cal-very_tight"></span>Meget stram</li>
+  <li><span class="swatch cal-over"></span>Overkapacitet</li>
+  <li><span class="swatch cal-closed"></span>Lukket</li>
+</ul>
+
+<div class="months">
+  {% for month in months %}
+  <section class="card month">
+    <h2>{{ month.name }}</h2>
+    <table class="mini-cal">
+      <thead>
+        <tr><th class="wk">Uge</th>{% for wd in weekdays %}<th>{{ wd }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for w in month.weeks %}
+        <tr{% if w.current %} class="current"{% endif %}>
+          <th class="wk"><a href="{% url 'week' w.iso_year w.week %}">{{ w.week }}</a></th>
+          {% for c in w.days %}
+          <td class="{% if c.closed %}cal-closed{% elif c.status %}cal-{{ c.status }}{% endif %}{% if c.today %} today{% endif %}"{% if c.title %} title="{{ c.title }}"{% endif %}>
+            {% if c.in_month %}<a href="{% url 'week' w.iso_year w.week %}">{{ c.day }}</a>{% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}
